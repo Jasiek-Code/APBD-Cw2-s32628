@@ -31,7 +31,7 @@ public class RentalService : IRentalService
         _activeRentals.Add(new Rental(user, hardware, daysToRent));
     }
 
-    public void Return(Hardware hardware)
+    public void Return(Hardware hardware, DateTime? returnDate)
     {
         var userRental = _activeRentals.FirstOrDefault(
             rental => rental.Hardware.Equals(hardware)
@@ -41,8 +41,9 @@ public class RentalService : IRentalService
         {
             throw new Exception($"No user rental found for hardware {hardware}");
         }
-
-        var actualReturnDate = DateTime.Now;
+        
+        var actualReturnDate = returnDate ?? DateTime.Now;
+        
         var dueDate = userRental.DueDate;
         
         if (actualReturnDate > dueDate)
@@ -55,8 +56,8 @@ public class RentalService : IRentalService
             userRental.Penalty = penalty;
         }
         
-        userRental.ReturnDate = actualReturnDate;
         hardware.IsAvailable = true;
+        userRental.ReturnDate = actualReturnDate;
     }
 
     private static decimal CalculatePenalty(int daysLate)
