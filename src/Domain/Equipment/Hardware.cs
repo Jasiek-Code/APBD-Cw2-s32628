@@ -1,4 +1,10 @@
-﻿namespace projekt_obiektowy.Domain.Equipment;
+﻿using System.Text.Json.Serialization;
+
+namespace projekt_obiektowy.Domain.Equipment;
+
+[JsonDerivedType(typeof(Laptop), typeDiscriminator: "laptop")]
+[JsonDerivedType(typeof(Projector), typeDiscriminator: "projector")]
+[JsonDerivedType(typeof(Camera), typeDiscriminator: "camera")]
 
 public abstract class Hardware(string name)
 {

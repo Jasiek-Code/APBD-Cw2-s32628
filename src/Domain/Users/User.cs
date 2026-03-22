@@ -1,4 +1,9 @@
-﻿namespace projekt_obiektowy.Domain.Users;
+﻿using System.Text.Json.Serialization;
+
+namespace projekt_obiektowy.Domain.Users;
+
+[JsonDerivedType(typeof(Student), typeDiscriminator: "student")]
+[JsonDerivedType(typeof(Employee), typeDiscriminator: "employee")]
 
 public abstract class User(string name, string surname)
 {

@@ -1,5 +1,4 @@
-﻿using projekt_obiektowy.Domain;
-using projekt_obiektowy.Domain.Equipment;
+﻿using projekt_obiektowy.Domain.Equipment;
 using projekt_obiektowy.Domain.Users;
 using projekt_obiektowy.Services;
 

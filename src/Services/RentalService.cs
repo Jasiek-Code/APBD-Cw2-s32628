@@ -1,6 +1,7 @@
 ﻿using projekt_obiektowy.Domain;
 using projekt_obiektowy.Domain.Equipment;
 using projekt_obiektowy.Domain.Users;
+using System.Text.Json;
 
 namespace projekt_obiektowy.Services;
 
@@ -61,5 +62,26 @@ public class RentalService : IRentalService
     private static decimal CalculatePenalty(int daysLate)
     {
         return daysLate == 0 ? 0 : daysLate * 10m;
+    }
+    
+    public void SaveData(string filePath = "./Data/rentals.json")
+    {
+        Directory.CreateDirectory("Data"); 
+        
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var jsonString = JsonSerializer.Serialize(_activeRentals, options);
+        File.WriteAllText(filePath, jsonString);
+    }
+
+    public void LoadData(string filePath = "./Data/rentals.json")
+    {
+        if (!File.Exists(filePath)) return;
+        
+        var jsonString = File.ReadAllText(filePath);
+        var loadedRentals = JsonSerializer.Deserialize<List<Rental>>(jsonString);
+
+        if (loadedRentals == null) return;
+        _activeRentals.Clear();
+        _activeRentals.AddRange(loadedRentals);
     }
 }
