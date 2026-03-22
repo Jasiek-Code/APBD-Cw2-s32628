@@ -1,4 +1,4 @@
-﻿namespace projekt_obiektowy;
+﻿namespace projekt_obiektowy.Domain;
 
 public abstract class Hardware(string name)
 {
