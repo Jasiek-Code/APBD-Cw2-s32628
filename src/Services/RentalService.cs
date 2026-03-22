@@ -4,27 +4,56 @@ namespace projekt_obiektowy.Services;
 
 public class RentalService : IRentalService
 {
-    private readonly List<Rental> _activeRentals = [];
+    private readonly List<Rental> _rentals = [];
 
     public void Rent(User user, Hardware hardware, int daysToRent)
     {
-        var activeRentalsForUser = _activeRentals.Count(rental => rental.User.Equals(user));
+        var activeRentalsForUser = _rentals
+            .Count(rental => rental.User.Equals(user) && rental.ReturnDate == null);
 
-        if (activeRentalsForUser < user.MaxRentals)
+        if (activeRentalsForUser >= user.MaxRentals)
         {
-            throw new Exception("Rental limit for " +  user.Name + " " + user.Surname + " reached");
+            throw new Exception($"Rental limit for {user.Name} {user.Surname} reached.");
         }
 
         if (!hardware.IsAvailable)
         {
-            throw new Exception("Hardware not available");
+            throw new Exception($"Hardware {hardware.Name} is not available.");
         }
         
-        _activeRentals.Add(new Rental(user, hardware, daysToRent));
+        hardware.IsAvailable = false;
+        _rentals.Add(new Rental(user, hardware, daysToRent));
     }
 
     public void Return(Hardware hardware)
     {
+        var userRental = _rentals.FirstOrDefault(rental => 
+            rental.Hardware.Equals(hardware) && rental.ReturnDate == null);
+
+        if (userRental is null)
+        {
+            throw new Exception($"No user rental found for hardware {hardware}");
+        }
+
+        var actualReturnDate = DateTime.Now;
+        var dueDate = userRental.DueDate;
         
+        if (actualReturnDate > dueDate)
+        {
+            var delay = actualReturnDate - dueDate;
+            var daysLate = delay.Days;
+            
+            var penalty = CalculatePenalty(daysLate);
+            
+            userRental.Penalty = penalty;
+        }
+        
+        userRental.ReturnDate = actualReturnDate;
+        hardware.IsAvailable = true;
+    }
+
+    private decimal CalculatePenalty(int daysLate)
+    {
+        return daysLate == 0 ? 0 : daysLate * 10m;
     }
 }
