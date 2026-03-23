@@ -4,9 +4,9 @@
 Konsolowa aplikacja obiektowa napisana w języku C# do zarządzania wypożyczeniami sprzętu (np. dla studentów).
 Projekt demonstruje podstawowe zasady programowania obiektowego oraz SOLID, czystą architekturę oraz mechanizmy utrwalania danych.
 
-## Funkcjonalności
+### Funkcjonalności
 
-* **Konsolowy interfejs użytkownika (UI):** Demo aplikacji w menu konsolowym.
+* **Konsolowy interfejs użytkownika (UI):** prosta aplikacja konsolowa do interakcji z bazą wypożyczalni.
 * **Zapis danych do JSON:** Stan aplikacji jest automatycznie zapisywany i wczytywany przy użyciu `System.Text.Json`.
 * **Wstrzykiwanie zależności:** Luźne powiązanie (loose coupling) między warstwą prezentacji a logiką biznesową za pomocą interfejsu `IRentalService`.
 * **Zapytania LINQ:** Filtrowanie aktywnych wypożyczeń, zakończonych transakcji oraz obliczanie kar za opóźnienia.
@@ -16,7 +16,7 @@ Projekt demonstruje podstawowe zasady programowania obiektowego oraz SOLID, czys
 ```
 projekt_obiektowy/
 │
-├── bin/.../Data/     # Automatycznie generowana baza danych JSON (rentals.json)
+├── bin/.../Data/     # Automatycznie generowanu plik JSON (rentals.json)
 ├── src/
     ├── Domain/       # Modele biznesowe (User, Hardware, Rental, Laptop, Projector)
     ├── Services/     # Logika biznesowa i interfejsy (RentalService, IRentalService)
