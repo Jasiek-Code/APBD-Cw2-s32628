@@ -8,10 +8,9 @@ public static class ConsoleMenu
 {
     public static void Run(IRentalService rentalService)
     {
-        rentalService.LoadData();
-        
         // objects for testing
         var student = new Student("Jan", "Kowalski");
+        var employee = new Employee("Zdzisław", "Nowak");
         var laptop = new Laptop("Dell XPS 15", "Intel i7", 16);
         var projector = new Projector("Epson 1080p", 3000, "1920x1080");
         
@@ -26,9 +25,10 @@ public static class ConsoleMenu
             Console.WriteLine("3. Show finished rentals with no penalty");
             Console.WriteLine("4. Show finished rentals with penalty");
             Console.WriteLine("5. Rent Laptop to Student");
-            Console.WriteLine("6. Return Laptop");
-            Console.WriteLine("7. (TEST) Rent Projector & Return it late");
-            Console.WriteLine("8. Exit");
+            Console.WriteLine("6. Rent Laptop to Employee");
+            Console.WriteLine("7. Return Laptop");
+            Console.WriteLine("8. (TEST) Rent Projector & Return it late");
+            Console.WriteLine("9. Exit");
             Console.WriteLine("-------------------------------");
             Console.Write("Choose an action: ");
             
@@ -54,11 +54,16 @@ public static class ConsoleMenu
                             break; 
                         }
                         
-                        Console.WriteLine($"   Client {null,-6} Rental {null,-8} Status {null, -3} Penalty(PLN) {null,-7} Date");
+                        Console.WriteLine($"{"Client",-17} | {"Hardware",-15} | {"Status",-12} | {"Penalty",-8} | Date");
+                        Console.WriteLine(new string('-', 85));
+
                         foreach (var rental in rentalService.Rentals)
                         {
                             var status = rental.ReturnDate == null ? "(active)" : "(returned)";
-                            Console.WriteLine($"{rental.User.Name} {rental.User.Surname,-10} {rental.Hardware.Name,-15} {status,-16} {rental.Penalty, -10} {rental.RentDate:dd.MM.yyyy HH:mm}");
+                            
+                            var fullName = $"{rental.User.Name} {rental.User.Surname}";
+                            
+                            Console.WriteLine($"{fullName,-17} | {rental.Hardware.Name,-15} | {status,-12} | {rental.Penalty,-8} | {rental.RentDate:dd.MM.yyyy HH:mm}");
                         }
                         break;
                     }
@@ -144,7 +149,7 @@ public static class ConsoleMenu
                     case "5":
                     {
                         Console.Clear();
-                        Console.WriteLine("--- RENT LAPTOP ---");
+                        Console.WriteLine("--- RENT LAPTOP TO STUDENT ---");
 
                         try
                         {
@@ -168,6 +173,30 @@ public static class ConsoleMenu
                     case "6":
                     {
                         Console.Clear();
+                        Console.WriteLine("--- RENT LAPTOP TO EMPLOYEE ---");
+
+                        try
+                        {
+                            rentalService.Rent(employee, laptop, 14);
+                            
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine("\n[Success] Laptop successfully rented to Student for 14 days.");
+                            Console.ResetColor();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"\n[Error] Could not rent laptop: {e.Message}");
+                            Console.ResetColor();
+                        }
+                        
+
+                        break;
+                    }
+
+                    case "7":
+                    {
+                        Console.Clear();
                         
                         var activeLaptopRental = rentalService.Rentals
                             .FirstOrDefault(r => r.ReturnDate == null && r.Hardware is Laptop);
@@ -189,7 +218,7 @@ public static class ConsoleMenu
                         break;
                     }
 
-                    case "7":
+                    case "8":
                     {
                         Console.Clear();
 
@@ -220,7 +249,7 @@ public static class ConsoleMenu
                         break;
                     }
 
-                    case "8": isRunning = false; break;
+                    case "9": isRunning = false; break;
 
                     default:
                         Console.Clear();
@@ -236,10 +265,8 @@ public static class ConsoleMenu
                 Console.WriteLine($"[Error] {e.Message}");
             }
 
-            if (isRunning) 
+            if (isRunning)
             {
-                rentalService.SaveData();
-                
                 Console.WriteLine("\nPress Enter to continue...");
                 Console.ReadLine(); 
             }

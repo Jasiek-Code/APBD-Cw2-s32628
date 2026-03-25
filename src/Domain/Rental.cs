@@ -9,10 +9,23 @@ public class Rental(User user, Hardware hardware, int rentedForDays)
     public User User { get; } = user;
     public Hardware Hardware { get; } = hardware;
     public int RentedForDays { get; } = rentedForDays;
+    public decimal Penalty { get; private set; }
     
     public DateTime RentDate { get; init; } = DateTime.Now;
     public DateTime DueDate => RentDate.AddDays(RentedForDays);
     public DateTime? ReturnDate { get; set; }
+    
+    private const decimal DailyPenaltyRate = 10m; 
+    public void CalculateAndSetPenalty(DateTime actualReturnDate)
+    {
+        if (actualReturnDate <= DueDate)
+        {
+            Penalty = 0;
+            return;
+        }
 
-    public decimal Penalty { get; set; }
+        var daysLate = (actualReturnDate - DueDate).Days;
+        Penalty = daysLate * DailyPenaltyRate;
+    }
+
 }

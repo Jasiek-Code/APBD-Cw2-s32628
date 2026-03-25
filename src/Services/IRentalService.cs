@@ -10,7 +10,4 @@ public interface IRentalService
     
     void Rent(User user, Hardware hardware, int daysToRent);
     void Return(Guid hardwareId, DateTime? returnDate = null);
-    
-    void SaveData(string filePath = "Data/rentals.json");
-    void LoadData(string filePath = "Data/rentals.json");
 }

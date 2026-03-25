@@ -1,19 +1,24 @@
 ﻿using projekt_obiektowy.Domain;
 using projekt_obiektowy.Domain.Equipment;
 using projekt_obiektowy.Domain.Users;
-using System.Text.Json;
+using projekt_obiektowy.Repositories;
 
 namespace projekt_obiektowy.Services;
 
-public class RentalService : IRentalService
+public class RentalService(IRentalRepository repository) : IRentalService
 {
-    private readonly List<Rental> _activeRentals = [];
+    private readonly List<Rental> _rentals = repository.Load().ToList();
     
-    public IReadOnlyList<Rental> Rentals => _activeRentals.AsReadOnly();
-
+    public IReadOnlyList<Rental> Rentals => _rentals.AsReadOnly();
+    
+    private void SaveData()
+    {
+        repository.Save(_rentals);
+    }
+    
     public void Rent(User user, Hardware hardware, int daysToRent)
     {
-        var activeRentalsForUser = _activeRentals.Count(
+        var activeRentalsForUser = _rentals.Count(
             rental => rental.User.Equals(user) 
                       && rental.ReturnDate == null);
 
@@ -28,12 +33,14 @@ public class RentalService : IRentalService
         }
         
         hardware.IsAvailable = false;
-        _activeRentals.Add(new Rental(user, hardware, daysToRent));
+        _rentals.Add(new Rental(user, hardware, daysToRent));
+        
+        SaveData();
     }
 
     public void Return(Guid hardwareId, DateTime? returnDate = null)
     {
-        var userRental = _activeRentals.FirstOrDefault(
+        var userRental = _rentals.FirstOrDefault(
             rental => rental.Hardware.Id == hardwareId 
                       && rental.ReturnDate == null);
 
@@ -44,48 +51,11 @@ public class RentalService : IRentalService
         
         var actualReturnDate = returnDate ?? DateTime.Now;
         
-        var dueDate = userRental.DueDate;
-        
-        if (actualReturnDate > dueDate)
-        {
-            var delay = actualReturnDate - dueDate;
-            var daysLate = delay.Days;
-            
-            var penalty = CalculatePenalty(daysLate);
-            
-            userRental.Penalty = penalty;
-        }
+        userRental.CalculateAndSetPenalty(actualReturnDate);
         
         userRental.ReturnDate = actualReturnDate;
         userRental.Hardware.IsAvailable = true;
-    }
-
-    private static decimal CalculatePenalty(int daysLate)
-    {
-        return daysLate == 0 ? 0 : daysLate * 10m;
-    }
-    
-    public void SaveData(string filePath = "/Data/rentals.json")
-    {
-        Directory.CreateDirectory("Data"); 
         
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        var jsonString = JsonSerializer.Serialize(_activeRentals, options);
-        File.WriteAllText(filePath, jsonString);
-    }
-
-    public void LoadData(string filePath = "/Data/rentals.json")
-    {
-        if (!File.Exists(filePath)) return;
-        
-        var jsonString = File.ReadAllText(filePath);
-        
-        if (string.IsNullOrWhiteSpace(jsonString)) return;
-
-        var loadedRentals = JsonSerializer.Deserialize<List<Rental>>(jsonString);
-
-        if (loadedRentals == null) return;
-        _activeRentals.Clear();
-        _activeRentals.AddRange(loadedRentals);
+        SaveData();
     }
 }
