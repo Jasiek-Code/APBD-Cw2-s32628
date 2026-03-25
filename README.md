@@ -1,14 +1,14 @@
 ﻿# System Wypożyczania Sprzętu (Projekt Obiektowy)
 
 
-Konsolowa aplikacja obiektowa napisana w języku C# do zarządzania wypożyczeniami sprzętu (np. dla studentów).
-Projekt demonstruje podstawowe zasady programowania obiektowego oraz SOLID, czystą architekturę oraz mechanizmy utrwalania danych.
+Konsolowa aplikacja obiektowa napisana w języku C# do zarządzania wypożyczeniami sprzętu.
+Projekt demonstruje podstawowe zasady programowania obiektowego oraz zasady SOLID, czystą architekturę oraz mechanizmy utrwalania danych.
 
 ### Funkcjonalności
 
 * **Konsolowy interfejs użytkownika (UI):** prosta aplikacja konsolowa do interakcji z bazą wypożyczalni.
 * **Zapis danych do JSON:** Stan aplikacji jest automatycznie zapisywany i wczytywany przy użyciu `System.Text.Json`.
-* **Wstrzykiwanie zależności:** Luźne powiązanie (loose coupling) między warstwą prezentacji a logiką biznesową za pomocą interfejsu `IRentalService`.
+* **Wstrzykiwanie zależności:** Luźne sprzężenie m. in. pomiędzy warstwą prezentacji a logiką biznesową za pomocą interfejsu `IRentalService`.
 * **Zapytania LINQ:** Filtrowanie aktywnych wypożyczeń, zakończonych transakcji oraz obliczanie kar za opóźnienia.
 * **Obsługa wyjątków:** Obsługa błędów (try-catch) zapobiegająca zatrzymaniu działania aplikacji.
 
@@ -25,13 +25,16 @@ projekt_obiektowy/
     └── Program.cs    # Punkt wejścia aplikacji
 ```
 
-
 ### Uzasadnienie struktury
 
-Powyższa struktura powstała w celu zachowania zasad SOLID oraz dobrych praktyk programowania. Zadbano o zasady pojedynczej odpowiedzialności 
-m.in. ConsoleMenu.cs zajmuje się wyłącznie interakcją z użytkownikiem, a także każda klasa odpowiada za jeden spójny fragment domeny. 
-Warstwa ConsoleMenu.cs zależy od abstrakcji (IRentalService), a nie od konkretnych implementacji. Zadbałem również o wysoką kohezję; klasy są mocno skoncentrowane na swoim zadaniu m.in. w klasie `RentalService` 
-– wszystkie metody wewnątrz tej klasy `(Rent, Return, SaveData)` operują na tej samej kolekcji `_rentals` i dotyczą wyłącznie jednego tematu: obsługi wypożyczeń.
+Powyższy podział plików i folderów wynika bezpośrednio z zasad SOLID i dobrych praktyk inżynierii oprogramowania. 
+Chciałem, aby kod był czytelny, łatwy w utrzymaniu i gotowy na ewentualną rozbudowę.
+
+W projekcie widać wyraźny nacisk na:
+
+* **Pojedynczą odpowiedzialność (SRP):** Klasy nie wchodzą sobie w drogę i mają jedno konkretne zadanie. Na przykład `ConsoleMenu.cs` zajmuje się wyłącznie wyświetlaniem treści i interakcją z użytkownikiem, podczas gdy cała logika biznesowa została oddelegowana do `RentalService.cs`.
+* **Luźne sprzężenie (Low Coupling):** Warstwa interfejsu użytkownika nie jest na sztywno spięta z logiką systemu. UI zależy od abstrakcji (interfejsu `IRentalService.cs`), a nie od konkretnej implementacji pod spodem.
+* **Wysoką kohezja (High Cohesion):** Klasy są mocno skoncentrowane na swoim celu. Dobrym przykładem jest `RentalService.cs` – wszystkie metody wewnątrz tej klasy (jak `Rent`, `Return` czy operacje zapisu) operują na tej samej, wspólnej kolekcji `_rentals` i dotyczą wyłącznie obsługi wypożyczeń.
 
 ### Jak uruchomić
 
